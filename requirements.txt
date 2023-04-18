@@ -8,7 +8,7 @@ tls-client==0.1.5
 soupsieve==2.3.2.post1
 beautifulsoup4==4.11.1
 charset-normalizer==2.1.1
-python-telegram-bot==13.15
+python-telegram-bot==13.7 #13.15
 revChatGPT
 EdgeGPT
 flask

@@ -1,5 +1,9 @@
 #Extra added by Author
 .breakpoints
+.replit
+replit.nix
+poetry.lock
+pyproject.toml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
