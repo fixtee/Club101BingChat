@@ -26,7 +26,7 @@ class AIBot:
         if API:
             self.ChatGPTbot = GPT(api_key=f"{API}")
             self.GPTActive = False
-        self.botNick = NICK.lower() if NICK else None
+        self.botNick = NICK if NICK else None #.lower()
         self.botNicKLength = len(self.botNick) if self.botNick else 0
         # print("nick:", self.botNick)
 
@@ -41,7 +41,7 @@ class AIBot:
             result = await self.Bingbot.ask(prompt=prompt + message, conversation_style=self.ConversationStyle)
             numMessages = result["item"]["throttling"]["numUserMessagesInConversation"]
             maxNumMessages = result["item"]["throttling"]["maxNumUserMessagesInConversation"]
-            print(numMessages, "/", maxNumMessages, end="")
+            print(numMessages, "/", maxNumMessages, end="\n")
             result = result["item"]["messages"][1]["text"]
             if numMessages == maxNumMessages:
                 await Bingbot.reset()
@@ -106,21 +106,29 @@ class AIBot:
         orig_url = False
         reply_to_text: str=''
         chat_content: str=''
+        if update.message.text:
+          msg = update.message
+        elif update.edited_message.text:
+          msg = update.edited_message
+        else:
+          msg = []
         # print("\033[32m", update.effective_user.username, update.effective_user.id, update.message.text, "\033[0m")
         if (not update.effective_chat.type and update.effective_chat.type != types.ChatType.GROUP) or NICK is None:
-          chat_content = update.message.text
-          print(chat_content)
-        elif update.message.text[:self.botNicKLength].lower() == self.botNick:
-          chat_content = update.message.text[self.botNicKLength:].strip()
+          chat_content = msg.text
+        elif msg:
+          if self.botNick in msg.text:
+            chat_content = msg.text.replace(self.botNick, '')
+          else:
+            return       
         else:
           return
-
-        if update.message.entities is not None:
-          for entity in update.message.entities:
+          
+        if msg.entities is not None:
+          for entity in msg.entities:
             if entity.type == "url":
-              url = update.message.text[entity.offset: entity.offset + entity.length]
+              url = msg.text[entity.offset: entity.offset + entity.length]
               if url.startswith('http'):
-                params = get_parser_params(update.message.text)
+                params = get_parser_params(msg.text)
                 parser_option = params['parser_option']
                 orig_url = params['orig_url']
                 article_text = url_article_parser(url=url, parser_option=parser_option, orig_url=orig_url)
@@ -130,13 +138,13 @@ class AIBot:
                   chat_content = chat_content.replace(url, '')
                   chat_content = chat_content + "\n" + article_text
 
-        if update.message.reply_to_message:
-          if update.message.reply_to_message.entities is not None:
-            for entity in update.message.reply_to_message.entities:
+        if msg.reply_to_message:
+          if msg.reply_to_message.entities is not None:
+            for entity in msg.reply_to_message.entities:
               if entity.type == "url":
-                url = update.message.reply_to_message.text[entity.offset: entity.offset + entity.length]
+                url = msg.reply_to_message.text[entity.offset: entity.offset + entity.length]
                 if url.startswith('http'):
-                  params = get_parser_params(update.message.text)
+                  params = get_parser_params(msg.text)
                   parser_option = params['parser_option']
                   orig_url = params['orig_url']
                   article_text = url_article_parser(url=url, parser_option=parser_option, orig_url=orig_url)
@@ -147,25 +155,27 @@ class AIBot:
                     chat_content = chat_content + "\n" + article_text
                     break
 
-          if not url_yes:
-            if update.message.reply_to_message.text:
-              reply_to_text = update.message.reply_to_message.text
+          if not url_yes:           
+            if msg.reply_to_message.text:
+              reply_to_text = msg.reply_to_message.text
               if self.botNick in reply_to_text:
                 reply_to_text = reply_to_text.replace(self.botNick, '')
               if reply_to_text:
                 chat_content = chat_content + "\n" + reply_to_text
-            elif update.message.reply_to_message.caption:
-              chat_content = chat_content + "\n" + update.message.reply_to_message.caption
+            elif msg.reply_to_message.caption:
+              chat_content = chat_content + "\n" + msg.reply_to_message.caption
 
+        chat_content = chat_content.strip()
         prompt_len = get_prompt_len(prompt=[{"role": "user", "content": chat_content}])
         if prompt_len > self.max_tokens:
           context.bot.send_message(
-              chat_is = update.message.chat_id,
+              chat_id = update.message.chat_id,
               text = f'Длина запроса {prompt_len} токенов > максимальной длины разговора {self.max_tokens}',
               parse = "HTML",
           )          
           return
-          
+
+        print(chat_content)
         if COOKIES and chat_content and self.BingActive:
             _thread = threading.Thread(target=self.loop.run_until_complete, args=(self.getBing(chat_content, update, context),))
             _thread.start()
