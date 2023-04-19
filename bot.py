@@ -20,7 +20,7 @@ def start(update, context): # When the user enters/start, the text is returned
 
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
-    print(context.error)
+    print('Context error appeared', context.error)
     if not context.error:
       context.bot.send_message(chat_id=update.effective_chat.id, text="Something went wrong\! Please try again\.\n\n", parse_mode='MarkdownV2')
 

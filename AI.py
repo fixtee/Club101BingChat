@@ -44,7 +44,7 @@ class AIBot:
             print(numMessages, "/", maxNumMessages, end="\n")
             result = result["item"]["messages"][1]["text"]
             if numMessages == maxNumMessages:
-                await Bingbot.reset()
+                await self.Bingbot.reset()
         except Exception as e:
             print('\033[31m')
             print("response_msg", result)
@@ -165,6 +165,9 @@ class AIBot:
             elif msg.reply_to_message.caption:
               chat_content = chat_content + "\n" + msg.reply_to_message.caption
 
+        chat_content = chat_content.replace('▎ChatGPT3.5\n', '')
+        chat_content = chat_content.replace('▎Bing\n', '')
+        chat_content = re.sub(r'[^\w\s.,!?;:()\[\]{}<>\'\"@#$%^&*=+-/\\]', '', chat_content)
         chat_content = chat_content.strip()
         prompt_len = get_prompt_len(prompt=[{"role": "user", "content": chat_content}])
         if prompt_len > self.max_tokens:
@@ -175,7 +178,6 @@ class AIBot:
           )          
           return
 
-        print(chat_content)
         if COOKIES and chat_content and self.BingActive:
             _thread = threading.Thread(target=self.loop.run_until_complete, args=(self.getBing(chat_content, update, context),))
             _thread.start()
@@ -185,7 +187,7 @@ class AIBot:
     def reset_chat(self, update, context):
         if API:
             self.ChatGPTbot.reset()
-            self.GPTActive = True
+            self.GPTActive = False
         if COOKIES:
             self.BingActive = True
             self.loop.run_until_complete(self.resetBing())
