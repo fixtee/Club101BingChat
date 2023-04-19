@@ -117,7 +117,7 @@ class AIBot:
           chat_content = msg.text
         elif msg:
           if self.botNick in msg.text:
-            chat_content = msg.text.replace(self.botNick, '')
+            chat_content = msg.text.replace(self.botNick, '').strip()
           else:
             return       
         else:
@@ -132,10 +132,10 @@ class AIBot:
                 parser_option = params['parser_option']
                 orig_url = params['orig_url']
                 article_text = url_article_parser(url=url, parser_option=parser_option, orig_url=orig_url)
-                chat_content = chat_content.replace(f'parser_option{parser_option}', '')
-                chat_content = chat_content.replace('orig_url', '')
+                chat_content = chat_content.replace(f'parser_option{parser_option}', '').strip()
+                chat_content = chat_content.replace('orig_url', '').strip()
                 if article_text != '':
-                  chat_content = chat_content.replace(url, '')
+                  chat_content = chat_content.replace(url, '').strip()
                   chat_content = chat_content + "\n" + article_text
 
         if msg.reply_to_message:
@@ -148,8 +148,8 @@ class AIBot:
                   parser_option = params['parser_option']
                   orig_url = params['orig_url']
                   article_text = url_article_parser(url=url, parser_option=parser_option, orig_url=orig_url)
-                  chat_content = chat_content.replace(f'parser_option{parser_option}', '')
-                  chat_content = chat_content.replace('orig_url', '')
+                  chat_content = chat_content.replace(f'parser_option{parser_option}', '').strip()
+                  chat_content = chat_content.replace('orig_url', '').strip()
                   if article_text != '':
                     url_yes = True
                     chat_content = chat_content + "\n" + article_text
@@ -165,8 +165,8 @@ class AIBot:
             elif msg.reply_to_message.caption:
               chat_content = chat_content + "\n" + msg.reply_to_message.caption
 
-        chat_content = chat_content.replace('▎ChatGPT3.5\n', '')
-        chat_content = chat_content.replace('▎Bing\n', '')
+        chat_content = chat_content.replace('▎ChatGPT3.5\n', '').strip()
+        chat_content = chat_content.replace('▎Bing\n', '').strip()
         chat_content = re.sub(r'[^\w\s.,!?;:()\[\]{}<>\'\"@#$%^&*=+-/\\]', '', chat_content)
         chat_content = chat_content.strip()
         prompt_len = get_prompt_len(prompt=[{"role": "user", "content": chat_content}])
