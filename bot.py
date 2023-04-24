@@ -16,7 +16,6 @@ def start(update, context): # When the user enters/start, the text is returned
     update.message.reply_html(
         rf"Hi {user.mention_html()} I will provide assistance using both ChatGPT and BingChat.",
     )
-    update.message.reply_text(message, parse_mode='MarkdownV2')
 
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
