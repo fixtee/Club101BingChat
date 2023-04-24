@@ -113,7 +113,7 @@ class AIBot:
         else:
           msg = []
         # print("\033[32m", update.effective_user.username, update.effective_user.id, update.message.text, "\033[0m")
-        if (not update.effective_chat.type and update.effective_chat.type != types.ChatType.GROUP) or NICK is None:
+        if (not update.effective_chat.type and update.effective_chat.type != types.ChatType.GROUP and update.effective_chat.type != types.ChatType.SUPERGROUP) or NICK is None:
           chat_content = msg.text
         elif msg:
           if self.botNick in msg.text:
