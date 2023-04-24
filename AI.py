@@ -231,21 +231,21 @@ class AIBot:
         self.Conversation = ConversationStyle.balanced
         context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Bing Conversation Stype is now Balanced",
+            text="Bing Conversation Style is now Balanced",
         )    
 
     def bing_precise(self, update, context):
         self.Conversation = ConversationStyle.precise
         context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Bing Conversation Stype is now Precise",
+            text="Bing Conversation Style is now Precise",
         )   
 
     def bing_creative(self, update, context):
         self.Conversation = ConversationStyle.creative
         context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Bing Conversation Stype is now Creative",
+            text="Bing Conversation Style is now Creative",
         )
       
 def get_prompt_len(prompt: dict) -> int:
